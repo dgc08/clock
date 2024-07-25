@@ -1,51 +1,101 @@
 #include "include/alarm.h"
-#include "utils/include/program.h"
+#include "utils/include/time.h"
+#include "include/shared.h"
+#include "lib/slib/program.h"
 
-#include <sys/types.h>
+#include "lib/slib/process.h"
+#include "lib/slib/program.h"
+#include "lib/slib/types.h"
+
 #include <unistd.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 
 pid_t alarm_pid = 0;
 
-pid_t fork_to(void (*func)()) {
-    pid_t p;
-    p = fork();
-    if(p<0) {
-        error("Couldn't fork to start external process");
-    }
-    else if ( p == 0) {
-        func();
-        exit(0);
-    }
-
-    return p;
-}
+char* alarm_audio = "alarm.ogg";
 
 void start_ffplay() {
-    // This function completely hands over the process. Don't call this on the main process, use fork_to(start_ffplay) instead!
+    disable_process_output(); // > /dev/null 2>&1
 
-    // > /dev/null 2>&1
-    int dev_null = open("/dev/null", O_WRONLY);
-    if (dev_null == -1) {
-        error("Failed to open /dev/null");
-        exit(1);
-    }
-    dup2(dev_null, STDOUT_FILENO);
-    dup2(dev_null, STDERR_FILENO);
-    close(dev_null);
-
-    char* args[] = {"ffplay", "alarm.ogg", "-autoexit", "-nodisp", "-hide_banner", NULL};
+    char* args[] = {"ffplay", alarm_audio, "-autoexit", "-nodisp", "-hide_banner", NULL};
     execvp("ffplay", args);
-    error("Failed to start process");
+    throw_error(""); // the output goes to /dev/null anyway so no msg
 }
 
 void start_alarm() {
+    u_int pos = got_flag("-a"); // Check if other alarm should be used
+    if (pos && pos < SLIB_args_len-1)
+        alarm_audio = SLIB_args[pos+1];
+
     alarm_pid = fork_to(start_ffplay);
 }
 void stop_alarm() {
     if (alarm_pid) {
         kill(alarm_pid, SIGTERM);
     }
+}
+
+void test_alarm() {
+    start_alarm();
+    printf("Press enter to quit> ");
+    getchar();
+}
+
+void flat_alarm() {
+    char* re = "\r\033[K";
+    if (got_flag("-n")) {
+        re = "\n";
+    }
+    
+    char* pos_args[255];
+    byte pos_args_len;
+
+    get_pos_args(2, pos_args, &pos_args_len);
+
+    if (pos_args_len > 0) {
+        int timer_hours, timer_minutes, timer_seconds;
+        int hours, minutes, seconds, new_secs;
+        int diff_hours, diff_minutes, diff_seconds;
+
+        if (sscanf(pos_args[0], "%d:%d:%d", &timer_hours, &timer_minutes, &timer_seconds) == 3) {
+            printf("Wating for %02d:%02d:%02d\nRemaining:\n", timer_hours, timer_minutes, timer_seconds);
+
+            do {
+            get_time(&hours, &minutes, &seconds);
+
+            diff_hours = (timer_hours - hours) % 60;
+            diff_minutes = (timer_minutes - minutes) % 60;
+            diff_seconds = (timer_seconds - seconds) % 60;
+
+            if (diff_seconds < 0) {
+                diff_minutes--;
+                diff_seconds += 60;
+            }
+            if (diff_minutes < 0) {
+                diff_hours--;
+                diff_minutes += 60;
+            }
+            if (diff_hours < 0) {
+                diff_hours += 60;
+            }
+
+            printf("%s%02d:%02d:%02d", re, diff_hours, diff_minutes, diff_seconds);
+            fflush(stdout);
+
+            new_secs = seconds;
+            while (new_secs == seconds) {
+                get_time(&hours, &minutes, &new_secs);
+                delay(0.1);
+            }
+
+            } while (diff_hours != 0 || diff_minutes != 0 || diff_seconds != 0 );
+
+            printf("\n");
+            test_alarm();
+            return;
+        }
+    }
+    throw_error("Invalid time format");
 }

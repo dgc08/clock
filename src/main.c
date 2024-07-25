@@ -8,11 +8,8 @@
 #include "include/shared.h"
 #include "include/alarm.h"
 
-#include "utils/include/program.h"
+#include "lib/slib/program.h"
 #include "utils/include/time.h"
-
-char** args;
-int args_len;
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -21,19 +18,17 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    args = argv;
-    args_len = argc;
+    setup_slib_args(argv, argc);
     char* command = argv[1];
 
     atexit(stop_alarm);
 
     if (strcmp(command, "help") == 0)
         help();
-    else if (strcmp(command, "test-alarm") == 0) {
-        start_alarm();
-        printf("Press enter to stop alarm> ");
-        getchar();
-    }
+    else if (strcmp(command, "test-alarm") == 0)
+        test_alarm();
+    else if (strcmp(command, "flat-alarm") == 0)
+        flat_alarm();
     else if (strcmp(command, "term-clock") == 0)
         term_clock();
     else {
