@@ -4,7 +4,7 @@
 void start_alarm();
 void stop_alarm();
 
-void test_alarm();
+void interactive_alarm();
 void flat_alarm();
 
 #endif // ALARM_H_

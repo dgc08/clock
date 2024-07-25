@@ -26,10 +26,10 @@ int main(int argc, char *argv[]) {
     if (strcmp(command, "help") == 0)
         help();
     else if (strcmp(command, "test-alarm") == 0)
-        test_alarm();
-    else if (strcmp(command, "flat-alarm") == 0)
+        interactive_alarm();
+    else if (strcmp(command, "flat-alarm") == 0 || strcmp(command, "alarm") == 0)
         flat_alarm();
-    else if (strcmp(command, "term-clock") == 0)
+    else if (strcmp(command, "term-clock") == 0 || strcmp(command, "clock") == 0)
         term_clock();
     else {
         fprintf(stderr, "Unknown command: %s\n", command);

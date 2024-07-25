@@ -37,7 +37,7 @@ void stop_alarm() {
     }
 }
 
-void test_alarm() {
+void interactive_alarm() {
     start_alarm();
     printf("Press enter to quit> ");
     getchar();
@@ -48,19 +48,22 @@ void flat_alarm() {
     if (got_flag("-n")) {
         re = "\n";
     }
-    
-    char* pos_args[255];
-    byte pos_args_len;
+
+    // Allocate SLIB_args_len (argc) for array 
+    char** pos_args = malloc(sizeof(char*) * SLIB_args_len);
+    size_t pos_args_len = SLIB_args_len;
 
     get_pos_args(2, pos_args, &pos_args_len);
+    char* timer = pos_args[0];
+    free(pos_args);
 
     if (pos_args_len > 0) {
         int timer_hours, timer_minutes, timer_seconds;
         int hours, minutes, seconds, new_secs;
         int diff_hours, diff_minutes, diff_seconds;
 
-        if (sscanf(pos_args[0], "%d:%d:%d", &timer_hours, &timer_minutes, &timer_seconds) == 3) {
-            printf("Wating for %02d:%02d:%02d\nRemaining:\n", timer_hours, timer_minutes, timer_seconds);
+        if (sscanf(timer, "%d:%d:%d", &timer_hours, &timer_minutes, &timer_seconds) == 3) {
+            printf("Set timer for %02d:%02d:%02d\nRemaining:\n", timer_hours, timer_minutes, timer_seconds);
 
             do {
             get_time(&hours, &minutes, &seconds);
@@ -93,7 +96,9 @@ void flat_alarm() {
             } while (diff_hours != 0 || diff_minutes != 0 || diff_seconds != 0 );
 
             printf("\n");
-            test_alarm();
+            interactive_alarm();
+
+
             return;
         }
     }
