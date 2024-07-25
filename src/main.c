@@ -4,9 +4,12 @@
 #include <time.h>
 #include <string.h>
 
-#include "include/utils.h"
 #include "include/main.h"
 #include "include/shared.h"
+#include "include/alarm.h"
+
+#include "utils/include/program.h"
+#include "utils/include/time.h"
 
 char** args;
 int args_len;
@@ -22,11 +25,18 @@ int main(int argc, char *argv[]) {
     args_len = argc;
     char* command = argv[1];
 
-    if (strcmp(command, "help") == 0) {
+    atexit(stop_alarm);
+
+    if (strcmp(command, "help") == 0)
         help();
-    } else if (strcmp(command, "term-clock") == 0) {
+    else if (strcmp(command, "test-alarm") == 0) {
+        start_alarm();
+        printf("Press enter to stop alarm> ");
+        getchar();
+    }
+    else if (strcmp(command, "term-clock") == 0)
         term_clock();
-    } else {
+    else {
         fprintf(stderr, "Unknown command: %s\n", command);
         exit(1);
     }
@@ -51,7 +61,7 @@ void term_clock() {
         new_secs = seconds;
         while (new_secs == seconds) {
             get_time(&hours, &minutes, &new_secs);
-            usleep(1000);
+            delay(0.1);
         }
         printf("%s", re);
     }

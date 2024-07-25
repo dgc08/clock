@@ -1,41 +1,34 @@
-##
-#
-#
-# @file
-# @version 0.1
-
-# Compiler
-CXX = cc
-
-# Compiler flags
-CXXFLAGS = -w -Wall -Wextra -g
-
-# Source directory
-SRC_DIR = src
-
-# Source files
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-
-# Object directory
-OBJ_DIR = obj
-
-# Object files
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-
-# Executable name
+# Target executable
 TARGET = clok
+
+# Compiler and flags
+CC = gcc
+CFLAGS = -I src/ -Wall -Wextra -g #-w
+
+SRC_DIRS = src
+
+# The directory for object files
+OBJ_DIR = tmp
+
+# Find all .c files in SRC_DIRS
+SRCS := $(shell find $(SRC_DIRS) -name '*.c')
+
+# Generate the object file names by replacing .c with .o and prefixing with OBJ_DIR/
+OBJS := $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
 
 # Default target
 all: $(TARGET)
 
-# Compile source files into object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Link object files into the executable
+# Link the object files to create the target
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
+	@mkdir -p $(OBJ_DIR)  # Ensure OBJ_DIR exists
+	$(CC) $(LDFLAGS) -o $@ $^
 
-# Clean up object files and executable
+# Compile .c files into .o files
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)  # Ensure the directory for the object file exists
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+# Clean up the build
 clean:
-	rm -rf $(OBJ_DIR)/* $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET)

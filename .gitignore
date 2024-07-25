@@ -1,3 +1,4 @@
-obj/
+tmp/
 clok
 alarm.ogg
+.cache
