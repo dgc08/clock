@@ -5,22 +5,22 @@
 # @version 0.1
 
 # Compiler
-CXX = g++
+CXX = cc
 
 # Compiler flags
-CXXFLAGS = -w -Wall -Wextra -std=c++17 -g
+CXXFLAGS = -w -Wall -Wextra -g
 
 # Source directory
 SRC_DIR = src
 
 # Source files
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
 
 # Object directory
 OBJ_DIR = obj
 
 # Object files
-OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Executable name
 TARGET = clok
@@ -29,7 +29,7 @@ TARGET = clok
 all: $(TARGET)
 
 # Compile source files into object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Link object files into the executable
