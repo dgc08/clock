@@ -29,6 +29,8 @@ int main(int argc, char *argv[]) {
         interactive_alarm();
     else if (strcmp(command, "flat-alarm") == 0 || strcmp(command, "alarm") == 0)
         flat_alarm();
+    else if (strcmp(command, "flat-timer") == 0 || strcmp(command, "timer") == 0)
+        flat_timer();
     else if (strcmp(command, "term-clock") == 0 || strcmp(command, "clock") == 0)
         term_clock();
     else {
