@@ -7,9 +7,11 @@
 #include "include/main.h"
 #include "include/shared.h"
 #include "include/alarm.h"
+#include "include/player.h"
 
 #include "lib/slib/program.h"
-#include "utils/include/time.h"
+#include "lib/slib/time.h"
+
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

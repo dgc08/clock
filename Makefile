@@ -5,7 +5,9 @@ TARGET_DEBUG = clok_debug
 CC = gcc
 CFLAGS = -I src/ -Wall -Wextra
 
-DEBUG_FLAGS = -g
+DEBUG_LDFLAGS = -fsanitize=address -static-libasan
+
+DEBUG_FLAGS = -fsanitize=address -static-libasan -g
 RELEASE_FLAGS = -O2
 
 SRC_DIRS = src
@@ -35,7 +37,7 @@ $(TARGET): $(OBJS_RELEASE)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 $(TARGET_DEBUG): $(OBJS_DEBUG)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) $(DEBUG_LDFLAGS) -o $@ $^
 
 # Compile .c files into .o files for release
 $(OBJ_DIR_RELEASE)/%.o: %.c
