@@ -1,12 +1,12 @@
 #include "include/player.h"
 
-#include "lib/slib/types.h"
-
 #include "include/alarm.h"
-#include "sys/types.h"
-#include "lib/slib/time.h"
 #include "include/shared.h"
-#include "lib/slib/program.h"
+
+#include <slib/types.h>
+#include <slib/time.h>
+#include <slib/program.h>
+#include <slib/exceptions.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,7 +108,7 @@ void flat_timer() {
         int diff_hours, diff_minutes, diff_seconds;
 
         if (sscanf(timer, "%d:%d:%d", &diff_hours, &diff_minutes, &diff_seconds) == 3 || sscanf(timer, "%d.%d.%d", &diff_hours, &diff_minutes, &diff_seconds) == 3) {
-            printf("Set alarm for %02d:%02d:%02d\nRemaining:\n", diff_hours, diff_minutes, diff_seconds);
+            printf("Set timer in %02d:%02d:%02d\nRemaining:\n", diff_hours, diff_minutes, diff_seconds);
 
             do {
             diff_seconds--;

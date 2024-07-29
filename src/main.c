@@ -8,12 +8,14 @@
 #include "include/shared.h"
 #include "include/alarm.h"
 #include "include/player.h"
+#include "sys/types.h"
 
-#include "lib/slib/program.h"
-#include "lib/slib/time.h"
-
+#include <slib/program.h>
+#include <slib/exceptions.h>
+#include <slib/time.h>
 
 int main(int argc, char *argv[]) {
+
     if (argc < 2) {
         fprintf(stderr, "Usage: %s [command]\n", argv[0]);
         fprintf(stderr, "Try '%s help'\n", argv[0]);
@@ -21,8 +23,15 @@ int main(int argc, char *argv[]) {
     }
 
     setup_slib_args(argv, argc);
-    char* command = argv[1];
+    char* command;
+    {
+        char** pos_args = malloc(sizeof(char* ) * argc);
+        u_long len = 1;
+        get_pos_args_full(1, pos_args, &len);
+        command = pos_args[0];
 
+        free(pos_args);
+    }
     atexit(stop_alarm);
 
     if (strcmp(command, "help") == 0)
@@ -67,5 +76,5 @@ void term_clock() {
 }
 
 void help() {
-    printf("%s\n", help_text);
+    printf(help_text, SLIB_args[0]);
 }

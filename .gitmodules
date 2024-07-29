@@ -1,0 +1,3 @@
+[submodule "lib/slib"]
+	path = lib/slib
+	url = https://github.com/dgc08/slib

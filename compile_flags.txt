@@ -1,4 +1,6 @@
 -Isrc/
+-Ilib/slib/lib
 -Wall
 -Wextra
+-Wno-discarded-qualifiers
 -g

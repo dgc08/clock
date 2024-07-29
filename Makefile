@@ -1,16 +1,21 @@
+TEST_FLAGS = -b=cvlc -a=alarm1.ogg timer -- 0.5.0 # vlc / cvlc has usually better quality than ffplay
+
 TARGET = clok
 TARGET_DEBUG = clok_debug
 
-# Compiler and flags
-CC = gcc
-CFLAGS = -I src/ -Wall -Wextra
+DEBUG_LDFLAGS = -fsanitize=address
 
-DEBUG_LDFLAGS = -fsanitize=address -static-libasan
-
-DEBUG_FLAGS = -fsanitize=address -static-libasan -g
+DEBUG_FLAGS = -fsanitize=address -g
 RELEASE_FLAGS = -O2
 
-SRC_DIRS = src
+SRC_DIRS = src lib/slib/lib/slib/src 
+INCLUDE_DIRS = src lib/slib/lib
+
+INCLUDE_FLAGS = $(addprefix -I, $(INCLUDE_DIRS))
+
+# Compiler and flags
+CC = gcc
+CFLAGS = $(INCLUDE_FLAGS) -Wall -Wextra -Wno-discarded-qualifiers
 
 # The directory for object files
 TMP_DIR = tmp
@@ -27,11 +32,12 @@ OBJS_DEBUG := $(patsubst %.c,$(OBJ_DIR_DEBUG)/%.o,$(SRCS))
 # Default target
 all: release
 
-.PHONY: all debug release clean
+.PHONY: all debug release test clean
 
 debug: $(TARGET_DEBUG)
-
 release: $(TARGET)
+test: $(TARGET_DEBUG)
+	echo && ./$(TARGET_DEBUG) $(TEST_FLAGS)
 
 $(TARGET): $(OBJS_RELEASE)
 	$(CC) $(LDFLAGS) -o $@ $^
